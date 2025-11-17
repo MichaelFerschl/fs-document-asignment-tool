@@ -5,12 +5,16 @@ module.exports = async (req, res) => {
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 
+  // Set CORS headers
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+
   if (req.method === 'OPTIONS') {
-    return res.status(200).json(corsHeaders);
+    return res.status(200).end();
   }
 
   return res.status(200).json({
-    ...corsHeaders,
     status: 'ok',
     service: 'PDF Analyzer API',
     timestamp: new Date().toISOString(),

@@ -82,15 +82,19 @@ async function extractText(filePath) {
 
 // Main handler
 module.exports = async (req, res) => {
+  // Set CORS headers
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).json(corsHeaders);
+    return res.status(200).end();
   }
 
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({
-      ...corsHeaders,
       error: 'Method not allowed',
     });
   }
@@ -119,7 +123,6 @@ module.exports = async (req, res) => {
 
     if (!pdfFile) {
       return res.status(400).json({
-        ...corsHeaders,
         error: 'No file uploaded',
       });
     }
@@ -127,7 +130,6 @@ module.exports = async (req, res) => {
     // Check if file is PDF
     if (pdfFile.mimetype !== 'application/pdf') {
       return res.status(400).json({
-        ...corsHeaders,
         error: 'Only PDF files are allowed',
       });
     }
@@ -146,7 +148,6 @@ module.exports = async (req, res) => {
       }
 
       return res.status(400).json({
-        ...corsHeaders,
         error: 'Could not extract text from PDF',
         details: 'The PDF might be empty or contain only images',
       });
@@ -164,15 +165,11 @@ module.exports = async (req, res) => {
       console.error('Cleanup error:', e);
     }
 
-    return res.status(200).json({
-      ...corsHeaders,
-      ...analysisResult,
-    });
+    return res.status(200).json(analysisResult);
   } catch (error) {
     console.error('Error analyzing PDF:', error);
 
     return res.status(500).json({
-      ...corsHeaders,
       error: 'Failed to analyze PDF',
       details: error.message,
     });

@@ -1,0 +1,28 @@
+# Backend standalone server (not needed for Vercel)
+backend/
+
+# Development files
+*.log
+npm-debug.log*
+node_modules/
+
+# Test files
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Documentation (will be included in repo but not in build)
+SETUP.md
+
+# Local env files
+.env.local
+.env.development
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -33,3 +33,7 @@ uploads/
 
 # Testing
 coverage/
+
+# Vercel
+.vercel
+.vercel.json

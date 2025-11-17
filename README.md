@@ -2,6 +2,10 @@
 
 Eine moderne Webanwendung zur automatischen Analyse von PDF-Auftragsdokumenten und Rechnungen mit KI-Unterstützung durch Anthropic Claude.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MichaelFerschl/fs-document-asignment-tool)
+
+> **🚀 Vercel Deployment verfügbar!** Siehe [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) für Details.
+
 ## Features
 
 - **PDF-Upload mit Drag & Drop**: Einfaches Hochladen von PDF-Dokumenten
@@ -115,7 +119,7 @@ Die Anwendung ist nun verfügbar unter:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3001
 
-### Production Build
+### Production Build (Lokal)
 
 **Backend:**
 ```bash
@@ -130,6 +134,24 @@ cd frontend
 npm run build
 npm run preview
 ```
+
+### Cloud Deployment
+
+#### Vercel (Empfohlen)
+
+Die einfachste Methode für Deployment:
+
+1. [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MichaelFerschl/fs-document-asignment-tool)
+2. Setzen Sie `ANTHROPIC_API_KEY` als Environment Variable
+3. Fertig!
+
+Detaillierte Anleitung: [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+
+#### Andere Plattformen
+
+- **Netlify**: Ähnlich wie Vercel mit Functions
+- **Railway**: Gut für Backend-Services
+- **Render**: Full-stack Hosting
 
 ## Verwendung
 

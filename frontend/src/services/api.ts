@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { AnalysisResult } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// In production (Vercel), use relative URL to same domain
+// In development, use localhost backend
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

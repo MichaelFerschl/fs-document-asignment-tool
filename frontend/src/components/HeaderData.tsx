@@ -1,5 +1,5 @@
 import React from 'react';
-import { DocumentHeader } from '../types';
+import type { DocumentHeader } from '../types';
 import { FileText, Calendar, Building2, User, Euro, Clock } from 'lucide-react';
 
 interface HeaderDataProps {

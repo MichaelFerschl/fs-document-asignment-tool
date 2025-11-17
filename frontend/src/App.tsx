@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FileUpload } from './components/FileUpload';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { analyzePDF } from './services/api';
-import { AnalysisResult } from './types';
+import type { AnalysisResult } from './types';
 import { FileText, AlertCircle } from 'lucide-react';
 
 function App() {

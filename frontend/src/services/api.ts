@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AnalysisResult } from '../types';
+import type { AnalysisResult } from '../types';
 
 // In production (Vercel), use relative URL to same domain
 // In development, use localhost backend

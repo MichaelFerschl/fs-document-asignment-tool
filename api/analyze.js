@@ -82,6 +82,12 @@ async function extractText(filePath) {
 
 // Main handler
 module.exports = async (req, res) => {
+  console.log('[ANALYZE] Request received:', {
+    method: req.method,
+    headers: req.headers,
+    url: req.url
+  });
+
   // Set CORS headers
   Object.entries(corsHeaders).forEach(([key, value]) => {
     res.setHeader(key, value);
@@ -89,11 +95,13 @@ module.exports = async (req, res) => {
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
+    console.log('[ANALYZE] Handling OPTIONS request');
     return res.status(200).end();
   }
 
   // Only allow POST
   if (req.method !== 'POST') {
+    console.log('[ANALYZE] Method not allowed:', req.method);
     return res.status(405).json({
       error: 'Method not allowed',
     });
@@ -101,27 +109,54 @@ module.exports = async (req, res) => {
 
   try {
     // Check API key
+    console.log('[ANALYZE] Checking API key...');
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
+      console.error('[ANALYZE] ANTHROPIC_API_KEY not configured');
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
+    console.log('[ANALYZE] API key found');
 
     // Parse form data
+    console.log('[ANALYZE] Parsing form data...');
     const form = formidable({
       maxFileSize: 10 * 1024 * 1024, // 10MB
       keepExtensions: true,
     });
 
-    const [fields, files] = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve([fields, files]);
+    let fields, files;
+    try {
+      [fields, files] = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            console.error('[ANALYZE] Formidable parse error:', err);
+            reject(err);
+          } else {
+            console.log('[ANALYZE] Form parsed successfully:', {
+              fieldCount: Object.keys(fields).length,
+              fileCount: Object.keys(files).length,
+              files: Object.keys(files)
+            });
+            resolve([fields, files]);
+          }
+        });
       });
-    });
+    } catch (parseError) {
+      console.error('[ANALYZE] Failed to parse form:', parseError);
+      throw parseError;
+    }
 
     const pdfFile = files.pdf?.[0] || files.pdf;
+    console.log('[ANALYZE] PDF file info:', {
+      exists: !!pdfFile,
+      mimetype: pdfFile?.mimetype,
+      size: pdfFile?.size,
+      filepath: pdfFile?.filepath,
+      originalFilename: pdfFile?.originalFilename
+    });
 
     if (!pdfFile) {
+      console.error('[ANALYZE] No file uploaded');
       return res.status(400).json({
         error: 'No file uploaded',
       });
@@ -129,22 +164,32 @@ module.exports = async (req, res) => {
 
     // Check if file is PDF
     if (pdfFile.mimetype !== 'application/pdf') {
+      console.error('[ANALYZE] Invalid file type:', pdfFile.mimetype);
       return res.status(400).json({
         error: 'Only PDF files are allowed',
       });
     }
 
-    console.log(`Processing file: ${pdfFile.originalFilename || pdfFile.newFilename}`);
+    console.log(`[ANALYZE] Processing file: ${pdfFile.originalFilename || pdfFile.newFilename}`);
 
     // Extract text from PDF
-    const pdfText = await extractText(pdfFile.filepath);
+    console.log('[ANALYZE] Extracting text from PDF...');
+    let pdfText;
+    try {
+      pdfText = await extractText(pdfFile.filepath);
+      console.log(`[ANALYZE] Extracted ${pdfText?.length || 0} characters from PDF`);
+    } catch (extractError) {
+      console.error('[ANALYZE] PDF extraction error:', extractError);
+      throw new Error(`PDF extraction failed: ${extractError.message}`);
+    }
 
     if (!pdfText || pdfText.trim().length === 0) {
+      console.error('[ANALYZE] PDF is empty');
       // Cleanup
       try {
         await fs.unlink(pdfFile.filepath);
       } catch (e) {
-        console.error('Cleanup error:', e);
+        console.error('[ANALYZE] Cleanup error:', e);
       }
 
       return res.status(400).json({
@@ -153,25 +198,46 @@ module.exports = async (req, res) => {
       });
     }
 
-    console.log(`Extracted ${pdfText.length} characters from PDF`);
-
     // Analyze with Claude
-    const analysisResult = await analyzeDocument(pdfText, apiKey);
+    console.log('[ANALYZE] Sending to Claude API...');
+    let analysisResult;
+    try {
+      analysisResult = await analyzeDocument(pdfText, apiKey);
+      console.log('[ANALYZE] Claude analysis completed successfully');
+    } catch (claudeError) {
+      console.error('[ANALYZE] Claude API error:', claudeError);
+      throw new Error(`Claude API failed: ${claudeError.message}`);
+    }
 
     // Cleanup file
+    console.log('[ANALYZE] Cleaning up file...');
     try {
       await fs.unlink(pdfFile.filepath);
     } catch (e) {
-      console.error('Cleanup error:', e);
+      console.error('[ANALYZE] Cleanup error:', e);
     }
 
+    console.log('[ANALYZE] Sending successful response');
     return res.status(200).json(analysisResult);
   } catch (error) {
-    console.error('Error analyzing PDF:', error);
+    console.error('[ANALYZE] Error analyzing PDF:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
 
     return res.status(500).json({
       error: 'Failed to analyze PDF',
       details: error.message,
+      errorName: error.name,
+      errorStack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
+};
+
+// Vercel configuration
+module.exports.config = {
+  api: {
+    bodyParser: false,
+  },
 };

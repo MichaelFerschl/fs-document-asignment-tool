@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnalysisResult } from '../types';
+import type { AnalysisResult } from '../types';
 import { HeaderData } from './HeaderData';
 import { LineItems } from './LineItems';
 import { CheckCircle, AlertCircle, Download } from 'lucide-react';

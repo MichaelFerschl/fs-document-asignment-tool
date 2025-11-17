@@ -1,5 +1,5 @@
 import React from 'react';
-import { DocumentLine } from '../types';
+import type { DocumentLine } from '../types';
 import { ShoppingCart } from 'lucide-react';
 
 interface LineItemsProps {

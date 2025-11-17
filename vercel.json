@@ -6,8 +6,7 @@
   "functions": {
     "api/**/*.js": {
       "memory": 1024,
-      "maxDuration": 60,
-      "maxBodySize": "10mb"
+      "maxDuration": 60
     }
   },
   "rewrites": [

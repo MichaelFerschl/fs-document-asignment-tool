@@ -1,15 +1,8 @@
 {
-  "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm install --prefix frontend && npm install --prefix backend",
+  "installCommand": "npm install --prefix frontend && npm install --prefix api",
   "devCommand": "cd frontend && npm run dev",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    }
-  ],
   "functions": {
     "api/**/*.js": {
       "memory": 1024,
@@ -20,10 +13,6 @@
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

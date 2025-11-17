@@ -1,0 +1,24 @@
+{
+  "name": "pdf-document-analyzer",
+  "version": "1.0.0",
+  "description": "PDF document analyzer with Claude AI",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview",
+    "type-check": "cd backend && npm run type-check && cd ../frontend && npm run build -- --mode development"
+  },
+  "keywords": ["pdf", "analyzer", "claude", "ai"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
